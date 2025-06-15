@@ -1,81 +1,149 @@
+// screens/Timeline.js
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, Text, FlatList, StyleSheet, ScrollView } from 'react-native';
 import WeekGrid from '../components/WeekGrid';
-import EventModal from '../components/EventModal';
-import { fetchHistoricalEvents } from '../data/history';
-import { getEvents } from '../utils/storage';
+import { getUserHistory } from '../data/history';
 
 export default function TimelineScreen({ route }) {
-  const { totalWeeks } = route.params;
+  const { totalWeeks, birthdate } = route.params;
+  const [history, setHistory] = useState({});
   const [selectedWeek, setSelectedWeek] = useState(null);
-  const [events, setEvents] = useState({});
-  const [historicalData, setHistoricalData] = useState({});
-  const [loading, setLoading] = useState(true);
 
-  // Load saved events and historical data
+  // Load user's custom history
   useEffect(() => {
-    const loadData = async () => {
-      try {
-        const [userEvents, historical] = await Promise.all([
-          getEvents(),
-          fetchHistoricalEvents(totalWeeks)
-        ]);
-        setEvents(userEvents);
-        setHistoricalData(historical);
-      } catch (error) {
-        console.error('Failed to load data:', error);
-      } finally {
-        setLoading(false);
-      }
+    const loadHistory = async () => {
+      const userHistory = await getUserHistory();
+      setHistory(userHistory);
     };
-    loadData();
-  }, [totalWeeks]);
+    loadHistory();
+  }, []);
 
-  if (loading) {
-    return (
-      <View style={styles.center}>
-        <ActivityIndicator size="large" />
-      </View>
-    );
-  }
+  // Convert history object to sorted array with dates
+  const sortedHistory = Object.entries(history)
+    .map(([week, text]) => {
+      const date = new Date(birthdate);
+      date.setDate(date.getDate() + (Number(week) * 7));
+      return {
+        week: Number(week),
+        text,
+        date: date.toLocaleDateString()
+      };
+    })
+    .sort((a, b) => a.week - b.week);
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.header}>
-        Your {totalWeeks.toLocaleString()} Weeks
-      </Text>
+    <ScrollView style={styles.container}>
+      {/* Enhanced Week Grid */}
+      <View style={styles.gridContainer}>
+        <Text style={styles.sectionTitle}>Your Life in Weeks</Text>
+        <WeekGrid 
+          totalWeeks={totalWeeks}
+          markedWeeks={Object.keys(history).map(Number)}
+          onSelectWeek={setSelectedWeek}
+        />
+        <Text style={styles.gridFooter}>
+          {totalWeeks} weeks | {Math.round(totalWeeks/52)} years
+        </Text>
+      </View>
 
-      <WeekGrid 
-        totalWeeks={totalWeeks}
-        events={events}
-        historicalEvents={historicalData}
-        onSelectWeek={setSelectedWeek}
-      />
-
-      <EventModal
-        week={selectedWeek}
-        visible={!!selectedWeek}
-        onClose={() => setSelectedWeek(null)}
-        existingEvent={events[selectedWeek]}
-      />
-    </View>
+      {/* History Timeline */}
+      <View style={styles.historyContainer}>
+        <Text style={styles.sectionTitle}>Life Events</Text>
+        
+        {sortedHistory.length > 0 ? (
+          <FlatList
+            data={sortedHistory}
+            scrollEnabled={false}
+            keyExtractor={(item) => item.week.toString()}
+            renderItem={({ item }) => (
+              <View style={styles.historyItem}>
+                <View style={styles.weekBadge}>
+                  <Text style={styles.weekBadgeText}>Week {item.week}</Text>
+                  <Text style={styles.weekDateText}>{item.date}</Text>
+                </View>
+                <Text style={styles.eventText}>{item.text}</Text>
+              </View>
+            )}
+          />
+        ) : (
+          <Text style={styles.emptyText}>
+            Tap on weeks above to add significant life events
+          </Text>
+        )}
+      </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 20,
+    backgroundColor: '#fff',
   },
-  header: {
+  gridContainer: {
+    padding: 20,
+    backgroundColor: '#f8f9fa',
+    borderRadius: 12,
+    margin: 16,
+    marginBottom: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    elevation: 3,
+  },
+  historyContainer: {
+    padding: 20,
+    margin: 16,
+    marginTop: 8,
+  },
+  sectionTitle: {
     fontSize: 20,
-    textAlign: 'center',
-    marginVertical: 10,
-    fontWeight: 'bold',
+    fontWeight: '600',
+    color: '#2c3e50',
+    marginBottom: 16,
   },
-  center: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+  gridFooter: {
+    textAlign: 'center',
+    color: '#7f8c8d',
+    marginTop: 12,
+    fontSize: 14,
+  },
+  historyItem: {
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    padding: 16,
+    marginBottom: 12,
+    borderLeftWidth: 4,
+    borderLeftColor: '#3498db',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 3,
+    elevation: 1,
+  },
+  weekBadge: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 8,
+  },
+  weekBadgeText: {
+    fontWeight: 'bold',
+    color: '#3498db',
+  },
+  weekDateText: {
+    color: '#95a5a6',
+    fontSize: 12,
+  },
+  eventText: {
+    fontSize: 15,
+    lineHeight: 22,
+    color: '#34495e',
+  },
+  emptyText: {
+    textAlign: 'center',
+    color: '#bdc3c7',
+    marginTop: 20,
+    fontStyle: 'italic',
   },
 });
