@@ -30,10 +30,6 @@ export default function EventModal({ week, visible, onClose, birthdate }) {
           <Text style={styles.header}>
             Week {week} ({weekDate})
           </Text>
-          
-          <Text style={styles.subheader}>
-            Approximately: {weekDate}
-          </Text>
 
           <TextInput
             style={styles.input}
