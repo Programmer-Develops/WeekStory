@@ -18,7 +18,7 @@ export default function App() {
         <Stack.Screen 
           name="Timeline" 
           component={TimelineScreen} 
-          options={{ title: 'Your Life in Weeks' }}
+          options={{ title: 'Week Story' }}
         />
       </Stack.Navigator>
     </NavigationContainer>

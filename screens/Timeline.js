@@ -70,7 +70,7 @@ export default function TimelineScreen({ route }) {
                 <View style={styles.historyItem}>
                   <View style={styles.weekBadge}>
                     <Text style={styles.weekBadgeText}>Week {item.week}</Text>
-                    <Text style={styles.weekDateText}>{item.date}</Text>
+                    {/* <Text style={styles.weekDateText}>{item.date}</Text> */}
                   </View>
                   <Text style={styles.eventText}>{item.text}</Text>
                 </View>
@@ -134,9 +134,77 @@ export default function TimelineScreen({ route }) {
   );
 }
 
-// ... (keep your existing styles and add these new ones)
-
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+  gridContainer: {
+    padding: 20,
+    backgroundColor: '#f8f9fa',
+    borderRadius: 12,
+    margin: 16,
+    marginBottom: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    elevation: 3,
+  },
+  historyContainer: {
+    padding: 20,
+    margin: 16,
+    marginTop: 8,
+  },
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: '#2c3e50',
+    marginBottom: 16,
+  },
+  gridFooter: {
+    textAlign: 'center',
+    color: '#7f8c8d',
+    marginTop: 12,
+    fontSize: 14,
+  },
+  historyItem: {
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    padding: 16,
+    marginBottom: 12,
+    borderLeftWidth: 4,
+    borderLeftColor: '#3498db',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 3,
+    elevation: 1,
+  },
+  weekBadge: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 8,
+  },
+  weekBadgeText: {
+    fontWeight: 'bold',
+    color: '#3498db',
+  },
+  weekDateText: {
+    color: '#95a5a6',
+    fontSize: 12,
+  },
+  eventText: {
+    fontSize: 15,
+    lineHeight: 22,
+    color: '#34495e',
+  },
+  emptyText: {
+    textAlign: 'center',
+    color: '#bdc3c7',
+    marginTop: 20,
+    fontStyle: 'italic',
+  },
   modalOverlay: {
     flex: 1,
     justifyContent: 'center',

@@ -1,4 +1,3 @@
-// components/WeekGrid.js
 import React from 'react';
 import { View, TouchableOpacity, FlatList, StyleSheet } from 'react-native';
 

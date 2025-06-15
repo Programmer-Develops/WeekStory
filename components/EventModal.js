@@ -1,4 +1,3 @@
-// components/EventModal.js
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, Button, Modal, StyleSheet } from 'react-native';
 import { saveHistoryEvent } from '../data/history';
@@ -11,7 +10,7 @@ export default function EventModal({ week, visible, onClose, birthdate }) {
   useEffect(() => {
     if (birthdate && week) {
       const date = new Date(birthdate);
-      date.setDate(date.getDate() + (week * 7)); // Add weeks
+      date.setDate(date.getDate() + (week * 7));
       setWeekDate(date.toLocaleDateString());
     }
   }, [week, birthdate]);
@@ -28,7 +27,7 @@ export default function EventModal({ week, visible, onClose, birthdate }) {
       <View style={styles.modalContainer}>
         <View style={styles.modalContent}>
           <Text style={styles.header}>
-            Week {week} ({weekDate})
+            Week {week}
           </Text>
 
           <TextInput
