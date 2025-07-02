@@ -10,8 +10,14 @@ export default function EventModal({ week, visible, onClose, birthdate }) {
   useEffect(() => {
     if (birthdate && week) {
       const date = new Date(birthdate);
-      date.setDate(date.getDate() + (week * 7));
-      setWeekDate(date.toLocaleDateString());
+      if (!isNaN(date.getTime())) {
+        date.setDate(date.getDate() + (week * 7));
+        setWeekDate(date.toLocaleDateString());
+      } else {
+        setWeekDate('');
+      }
+    } else {
+      setWeekDate('');
     }
   }, [week, birthdate]);
 
@@ -26,9 +32,13 @@ export default function EventModal({ week, visible, onClose, birthdate }) {
     <Modal visible={visible} animationType="slide">
       <View style={styles.modalContainer}>
         <View style={styles.modalContent}>
+
           <Text style={styles.header}>
             Week {week}
           </Text>
+          {weekDate ? (
+            <Text style={styles.subheader}>Approx. date: {weekDate}</Text>
+          ) : null}
 
           <TextInput
             style={styles.input}
