@@ -1,32 +1,26 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, StyleSheet, ScrollView, Modal, TextInput, Button } from 'react-native';
+import { View, Text, FlatList, StyleSheet, ScrollView } from 'react-native';
+import EventModal from '../components/EventModal';
 import WeekGrid from '../components/WeekGrid';
 import { getUserHistory, saveHistoryEvent } from '../data/history';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function TimelineScreen({ route }) {
   const { totalWeeks, birthdate } = route.params;
   const [history, setHistory] = useState({});
   const [selectedWeek, setSelectedWeek] = useState(null);
-  const [eventText, setEventText] = useState('');
-
+  const [eventText, setEventText] = useState(''); // Not needed with EventModal, but kept for now
+  // useEffect(() => {
+  //   AsyncStorage.removeItem('@WeekStory_userHistory');
+  // }, []);
   // Load user's custom history
   useEffect(() => {
     const loadHistory = async () => {
-      const userHistory = await getUserHistory();
+      const userHistory = await getUserHistory(birthdate);
       setHistory(userHistory);
     };
     loadHistory();
-  }, []);
-
-  const handleSaveEvent = async () => {
-    if (selectedWeek && eventText.trim()) {
-      await saveHistoryEvent(selectedWeek, eventText);
-      const updatedHistory = await getUserHistory();
-      setHistory(updatedHistory);
-      setSelectedWeek(null);
-      setEventText('');
-    }
-  };
+  }, [birthdate]);
 
   // Convert history object to sorted array with dates
   const sortedHistory = Object.entries(history)
@@ -44,7 +38,7 @@ export default function TimelineScreen({ route }) {
   return (
     <View style={styles.container}>
       <ScrollView>
-        {/* Enhanced Week Grid */}
+
         <View style={styles.gridContainer}>
           <Text style={styles.sectionTitle}>Your Life in Weeks</Text>
           <WeekGrid 
@@ -57,7 +51,6 @@ export default function TimelineScreen({ route }) {
           </Text>
         </View>
 
-        {/* History Timeline */}
         <View style={styles.historyContainer}>
           <Text style={styles.sectionTitle}>Life Events</Text>
           
@@ -84,52 +77,17 @@ export default function TimelineScreen({ route }) {
         </View>
       </ScrollView>
 
-      {/* Event Modal */}
-      <Modal
+      <EventModal
+        week={selectedWeek}
         visible={!!selectedWeek}
-        transparent={true}
-        animationType="slide"
-      >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>
-              Week {selectedWeek}
-            </Text>
-            {selectedWeek && (
-                <Text style={styles.modalSubtitle}>
-                    {(() => {
-                        const date = new Date(birthdate);
-                        date.setDate(date.getDate() + (selectedWeek * 7));
-                        return date.toLocaleDateString();
-                    })()}
-                </Text>
-            )}
-            <TextInput
-              style={styles.modalInput}
-              placeholder="What happened this week?"
-              value={eventText}
-              onChangeText={setEventText}
-              multiline
-              numberOfLines={4}
-            />
-            <View style={styles.modalButtons}>
-              <Button
-                title="Cancel"
-                onPress={() => {
-                  setSelectedWeek(null);
-                  setEventText('');
-                }}
-                color="#999"
-              />
-              <Button
-                title="Save"
-                onPress={handleSaveEvent}
-                disabled={!eventText.trim()}
-              />
-            </View>
-          </View>
-        </View>
-      </Modal>
+        onClose={async () => {
+          // Refresh history after closing modal
+          const updatedHistory = await getUserHistory(birthdate);
+          setHistory(updatedHistory);
+          setSelectedWeek(null);
+        }}
+        birthdate={birthdate}
+      />
     </View>
   );
 }
