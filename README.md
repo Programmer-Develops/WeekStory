@@ -24,6 +24,3 @@
 - `/components` - EventModal.js, WeekGrid.js
 - `/screens` - Login.js, Timeline.js
 - `/utils` - storage.js
-
-## License
-MIT © 2023 ShantanuPandya
