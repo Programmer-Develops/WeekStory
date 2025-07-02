@@ -1,43 +1,39 @@
-// data/history.js
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const HISTORY_KEY = '@WeekStory_userHistory';
 
-// 1. Get all user's historical events
-export const getUserHistory = async () => {
+const getHistoryKey = (birthdate) => `@WeekStory_userHistory_${birthdate}`;
+
+export const getUserHistory = async (birthdate) => {
   try {
-    const json = await AsyncStorage.getItem(HISTORY_KEY);
+    const json = await AsyncStorage.getItem(getHistoryKey(birthdate));
     return json ? JSON.parse(json) : {};
   } catch {
     return {};
   }
 };
 
-// 2. Save new historical event
-export const saveHistoryEvent = async (week, description) => {
+export const saveHistoryEvent = async (birthdate, week, description) => {
   try {
-    const history = await getUserHistory();
+    const history = await getUserHistory(birthdate);
     history[week] = description;
-    await AsyncStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+    await AsyncStorage.setItem(getHistoryKey(birthdate), JSON.stringify(history));
   } catch (error) {
     console.error("Failed to save history:", error);
     throw error;
   }
 };
 
-// 3. Delete historical event
-export const deleteHistoryEvent = async (week) => {
+export const deleteHistoryEvent = async (birthdate, week) => {
   try {
-    const history = await getUserHistory();
+    const history = await getUserHistory(birthdate);
     delete history[week];
-    await AsyncStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+    await AsyncStorage.setItem(getHistoryKey(birthdate), JSON.stringify(history));
   } catch (error) {
     console.error("Failed to delete history:", error);
     throw error;
   }
 };
 
-// 4. Clear all history (optional)
-export const clearAllHistory = async () => {
-  await AsyncStorage.removeItem(HISTORY_KEY);
+export const clearAllHistory = async (birthdate) => {
+  await AsyncStorage.removeItem(getHistoryKey(birthdate));
 };
