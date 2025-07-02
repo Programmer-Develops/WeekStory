@@ -1,17 +1,16 @@
-// utils/storage.js
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const EVENTS_KEY_PREFIX = '@WeekStory_week_';
+// Helper to get a unique key per birthdate and week
+const getEventKey = (birthdate, week) => `@WeekStory_week_${birthdate}_${week}`;
+const getEventKeyPrefix = (birthdate) => `@WeekStory_week_${birthdate}_`;
 
-// Get ALL saved events
-export const getEvents = async () => {
+export const getEvents = async (birthdate) => {
   try {
     const allKeys = await AsyncStorage.getAllKeys();
-    const eventKeys = allKeys.filter(key => key.startsWith(EVENTS_KEY_PREFIX));
+    const eventKeys = allKeys.filter(key => key.startsWith(getEventKeyPrefix(birthdate)));
     const events = await AsyncStorage.multiGet(eventKeys);
-    
     return events.reduce((acc, [key, value]) => {
-      const weekNumber = key.replace(EVENTS_KEY_PREFIX, '');
+      const weekNumber = key.replace(getEventKeyPrefix(birthdate), '');
       acc[weekNumber] = JSON.parse(value);
       return acc;
     }, {});
@@ -21,11 +20,10 @@ export const getEvents = async () => {
   }
 };
 
-// Save single event
-export const saveEvent = async (week, eventData) => {
+export const saveEvent = async (birthdate, week, eventData) => {
   try {
     await AsyncStorage.setItem(
-      `${EVENTS_KEY_PREFIX}${week}`,
+      getEventKey(birthdate, week),
       JSON.stringify({
         ...eventData,
         createdAt: new Date().toISOString()
@@ -37,10 +35,9 @@ export const saveEvent = async (week, eventData) => {
   }
 };
 
-// Delete single event
-export const deleteEvent = async (week) => {
+export const deleteEvent = async (birthdate, week) => {
   try {
-    await AsyncStorage.removeItem(`${EVENTS_KEY_PREFIX}${week}`);
+    await AsyncStorage.removeItem(getEventKey(birthdate, week));
   } catch (error) {
     console.error('Failed to delete event:', error);
     throw error;
