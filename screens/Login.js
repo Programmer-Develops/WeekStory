@@ -12,7 +12,10 @@ export default function LoginScreen() {
     const today = new Date();
     const diffInMs = today - date;
     const weeksLived = Math.floor(diffInMs / (1000 * 60 * 60 * 24 * 7));
-    navigation.navigate('Timeline', { totalWeeks: weeksLived });
+    navigation.navigate('Timeline', {
+      totalWeeks: weeksLived,
+      birthdate: date.toISOString().slice(0, 10)
+    });
   };
 
   return (
