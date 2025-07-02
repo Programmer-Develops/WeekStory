@@ -23,7 +23,7 @@ export default function EventModal({ week, visible, onClose, birthdate }) {
 
   const handleSave = async () => {
     if (eventText.trim()) {
-      await saveHistoryEvent(week, eventText);
+      await saveHistoryEvent(birthdate, week, eventText);
     }
     onClose();
   };
