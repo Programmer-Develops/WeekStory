@@ -13,7 +13,7 @@ export default function App() {
         <Stack.Screen 
           name="Login" 
           component={LoginScreen} 
-          options={{ title: 'WeekStory - Your Birthdate' }}
+          options={{ headerShown: false }}
         />
         <Stack.Screen 
           name="Timeline" 
